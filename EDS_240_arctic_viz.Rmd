@@ -1,0 +1,101 @@
+---
+title: 'Visualizaion Redesign: Global Sea Ice Volume'
+author: "Marie Rivers"
+date: "2/3/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+library(readxl)
+library(lubridate)
+```
+
+```{r}
+data <- read_excel(here("data", "PIOMAS.vol.daily.1979.2021.Current.v2.1.xls"), sheet = "PIOMAS.vol.daily.1979.2021.Curr")
+data <- data %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(month_name = month.name[month]) %>% 
+  mutate(month_name = as.factor(month_name)) %>% 
+  mutate(month_name = fct_relevel(month_name, c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")))
+```
+
+```{r}
+ggplot(data = data, aes(x = day_of_year, y = vol, group = year)) +
+  geom_line(aes(color = year)) +
+  scale_color_gradientn(colors = c("firebrick2", "gray70", "deepskyblue3"), trans = 'reverse') +
+  labs(x = 'day of year', y = 'volume (1000 km^3)',
+       title = "While arctic sea ice extent has always varied by season, overall volumes continue to decrease each year",
+       subtitle = 'PIOMAS Ice Volume Data, 1979-2021',
+       caption = 'Data Source: http://psc.apl.uw.edu/research/projects/arctic-sea-ice-volume-anomaly/data') +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10), plot.title.position = "plot") + 
+  theme(plot.subtitle = element_text(size = 10)) +
+  theme(plot.caption = element_text(size = 8, hjust = 0), plot.caption.position = "plot")
+```
+
+For this visualization redesign I aggregated the data by year. I use daily volume values as reported in the data set and did not average by month or season. While I did make several exploratory visualizations that presented monthly averages to show seasonal trends, I ultimately felt that the seasonality was adequately shown through the daily data. For data cleaning, I extracted the `day_of_year` in excel before reading in the file. Other cleaning steps performed in R such as converting the data field to the proper class and extracting the month name were used during my initial exploratory visualizations.
+
+The visual variables I used include color hue, color value and location. I choose a line graph as a simple, effective way to compare values over time. The vertical location and repeating pattern of each line convey both the seasonal trend and the annual change. The location variable encodes ice volumes. Higher locations correspond with larger volumes of ice and lower locations correspond with smaller volumes of ice. The color variables encode time (year). I chose darker values of blue for earlier years and darker values of red for more current years to correspond with the trend of decreasing ice volume. The red observations are intended to be most alarming. The gestalt principles in this visualization include proximity and similarity.
+
+The audience of this visualization will already be familiar with the common consequences of climate change (ie warming global temperatures) and they will be aware that these consequences affect arctic ice. They will care about the rate of melting and any downward trends. The purpose is for the audience to comprehend the change in sea ice volume over the past 40 years. I want the audience to compare the magnitude of the blue lines to the red lines and realize that even the greatest red line is smaller than most blue observations. 
+
+Message: Arctic sea ice is melting each year despite season fluctuations.
+
+Visual task: The audience needs to compare the general colors of each line to the legend and then look at the y-axis and title to understand that this is a graph of sea ice volume. The audience should conclude that years before 2000 had more ice (colder years) than years after 2000 (warmer years).
+
+
+```{r eval=FALSE, include=FALSE}
+data_months <- data %>% 
+  group_by(month_name) %>% 
+  summarise(avg_vol = mean(vol))
+```
+
+```{r eval=FALSE, include=FALSE}
+data_years <- data %>% 
+  group_by(year)
+```
+
+```{r eval=FALSE, include=FALSE}
+arctic_viz <- ggplot(data = data, aes(x = date, y = vol)) + 
+  geom_line(aes(color = year))
+arctic_viz
+```
+
+```{r eval=FALSE, include=FALSE}
+ggplot(data = data, aes(y = month_name, x = vol)) +
+  geom_jitter(aes(color = year)) +
+  coord_flip()
+```
+
+```{r eval=FALSE, include=FALSE}
+ggplot(data = data, aes(x = month_name, y = vol)) +
+  geom_point(aes(color = year)) +
+  scale_fill_gradientn(colors = c("antiquewhite3", "antiquewhite4", "steelblue4", "springgreen4", "indianred4")) 
+```
+
+```{r eval=FALSE, include=FALSE}
+ggplot(data = data, aes(x = day_of_year, y = vol, group = year)) +
+  geom_point(aes(color = year)) +
+  scale_x_discrete(labels=month.abb)
+```
+
+```{r eval=FALSE, include=FALSE}
+ggplot(data = data, aes(x = day_of_year, y = vol, group = year)) +
+  geom_line(aes(color = year)) +
+  gghighlight(year %in% c("1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_color_gradientn(colors = c("steelblue4", "gray50", "indianred4"))
+  
+  #scale_color_paletteer_c("scico::berlin", direction = 1)
+```
+
+
+
+
