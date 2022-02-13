@@ -96,48 +96,6 @@ ggplot(data = data, aes(x = day_of_year, y = vol, group = year)) +
   #scale_color_paletteer_c("scico::berlin", direction = 1)
 ```
 
-```{r}
-data_polar <- data %>% 
-  mutate(angle = (2*pi * (month / 12))) %>% 
-  mutate(x_value = year * cos(angle)) %>% 
-  mutate(y_value = year * sin(angle))
-```
-
-```{r}
-min <- min(data_polar$angle)
-max <- max(data_polar$angle)
-
-ggplot(data_polar, aes(x = angle, y = year)) +
-  geom_jitter(aes(color = vol)) +
-  #scale_x_discrete("angle", labels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")) +
-  scale_x_continuous(limits = c(min, max), breaks = seq(min, max, by = (2*pi * (1 / 12)))) +
-  coord_polar(start = (2*pi * (1 / 12))) +
-  theme_minimal() + 
-  geom_hline(aes(yintercept = 1985), color = "red") +
-  geom_hline(aes(yintercept = 1990), color = "red") +
-  geom_hline(aes(yintercept = 2000), color = "red")
-```
-see this link to try plotting by month
-https://stackoverflow.com/questions/55583689/how-to-create-a-polar-plot-with-date-as-month-in-ggplot2
-```{r}
-ggplot(data_polar, aes(x = month, y = year)) +
-  coord_polar(theta = year, start = 0, direction = -1) +
-  geom_point(color = vol) +
-  theme_light()
-```
-
-
-```{r}
-ggplot(data = data_polar, aes(x = x_value, y = y_value)) +
-  geom_point(aes(fill = vol))
-```
-
-
-```{r}
-ggplot(data, aes(x = month_name, fill = year)) +
-  geom_histogram(binwidth = 12)
-  coord_polar(theta = month)
-```
 
 
 
